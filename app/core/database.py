@@ -10,7 +10,7 @@ database_url = settings.DATABASE_URL
 if database_url.startswith("postgresql://"):
     database_url = database_url.replace("postgresql://", "postgresql+psycopg://", 1)
 
-engine_kwargs = {
+engine_kwargs: dict = {
     "pool_size": 10,
     "max_overflow": 20,
     "pool_pre_ping": True,
@@ -20,6 +20,9 @@ if database_url.startswith("sqlite"):
     engine_kwargs.pop("pool_size", None)
     engine_kwargs.pop("max_overflow", None)
     engine_kwargs["connect_args"] = {"check_same_thread": False, "timeout": 15}
+elif database_url.startswith("mssql"):
+    engine_kwargs["connect_args"] = {"timeout": 30}
+    engine_kwargs["fast_executemany"] = True
 
 engine = create_engine(database_url, **engine_kwargs)
 
